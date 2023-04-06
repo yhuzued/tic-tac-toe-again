@@ -1,3 +1,10 @@
+// Player Object
+function Player(name, symbol) {
+  this.name = name;
+  this.symbol = symbol;
+  this.position = [];
+}
+
 // module reveal pattern for board
 const board = (function () {
   const gameRecord = [];
@@ -11,10 +18,10 @@ const board = (function () {
     const player2 = gameRecord[1].position; // array
 
     if (player1.length === player2.length) {
-      return gameRecord[1].symbol;
+      return gameRecord[0].symbol;
     }
 
-    return gameRecord[0].symbol;
+    return gameRecord[1].symbol;
   }
 
   function checkWin() {
@@ -74,12 +81,54 @@ const board = (function () {
   return { add, latestSymbol, checkWin, gameRecord };
 })();
 
-// Player Object
-function Player(name, symbol) {
-  this.name = name;
-  this.symbol = symbol;
-  this.position = [];
-}
+// display controller module
+const display = (function () {
+  function validClick(event) {
+    const clickedCell = event.target;
+
+    if (isInvalidClick(clickedCell)) {
+      return;
+    }
+
+    const currentPlayer =
+      board.gameRecord[board.latestSymbol() === "O" ? 1 : 0];
+
+    // Add coordinate to board and update display
+    currentPlayer.position.push(clickedCell.getAttribute("id"));
+    clickedCell.textContent = currentPlayer.symbol;
+    winnerAnnouncement(currentPlayer);
+    if (isDraw()) {
+      drawAnnouncement();
+    }
+  }
+
+  function isInvalidClick(clickedCell) {
+    const isNotTableCell = clickedCell.tagName !== "TD";
+    const hasBeenSelected =
+      clickedCell.textContent === "X" || clickedCell.textContent === "O";
+    const gameIsOver = board.checkWin();
+    return isNotTableCell || hasBeenSelected || gameIsOver;
+  }
+
+  function isDraw() {
+    const player1 = board.gameRecord[0].position.length;
+    const player2 = board.gameRecord[1].position.length;
+
+    return player1 + player2 === 9 && !board.checkWin();
+  }
+
+  function winnerAnnouncement(currentPlayer) {
+    if (board.checkWin()) {
+      console.log(`The winner is ${currentPlayer.name}`);
+    }
+  }
+
+  function drawAnnouncement() {
+    console.log("Draw");
+  }
+
+  return { validClick };
+})();
 
 // Main module
 (function () {
@@ -92,27 +141,6 @@ function Player(name, symbol) {
 
   // event listener
   table.addEventListener("click", (action) => {
-    isValidClick(action);
+    display.validClick(action);
   });
-
-  function isValidClick(event) {
-    const clickedCell = event.target;
-
-    if (
-      clickedCell.tagName !== "TD" ||
-      clickedCell.textContent === "X" ||
-      clickedCell.textContent === "O" ||
-      board.checkWin()
-    ) {
-      return;
-    }
-
-    // check weather this is player one or two (if X player 1, O player 2)
-    const latestSymbol = board.latestSymbol();
-    const playerIndex = latestSymbol === "O" ? 0 : 1;
-    const currentPlayer = board.gameRecord[playerIndex];
-
-    currentPlayer.position.push(clickedCell.getAttribute("id"));
-    clickedCell.textContent = board.latestSymbol();
-  }
 })();
