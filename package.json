@@ -1,0 +1,31 @@
+{
+  "name": "tic-tac-toe-again",
+  "version": "1.0.0",
+  "description": "A simple tic-tac-toe game built with Tailwind CSS.",
+  "main": "index.js",
+  "scripts": {
+    "dev": "nodemon --watch src --watch public/index.html --exec \"tailwindcss build src/tailwind.css -o public/css/tailwind.css\"",
+    "build": "NODE_ENV=production npm run dev",
+    "test": "echo \"No tests specified\" && exit 0"
+  },
+  "keywords": [
+    "tic-tac-toe",
+    "game",
+    "tailwindcss"
+  ],
+  "author": "Your Name",
+  "license": "MIT",
+  "devDependencies": {
+    "autoprefixer": "^10.4.14",
+    "eslint": "^8.37.0",
+    "eslint-config-prettier": "^8.8.0",
+    "eslint-config-standard": "^17.0.0",
+    "eslint-plugin-import": "^2.27.5",
+    "eslint-plugin-n": "^15.7.0",
+    "eslint-plugin-prettier": "^4.2.1",
+    "eslint-plugin-promise": "^6.1.1",
+    "nodemon": "^2.0.22",
+    "prettier": "2.8.7",
+    "tailwindcss": "^3.3.1"
+  }
+}
