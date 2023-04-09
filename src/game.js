@@ -90,16 +90,15 @@ const display = (function () {
       return;
     }
 
-    const currentPlayer =
-      board.gameRecord[board.latestSymbol() === "O" ? 1 : 0];
+    const currentPlayer = latestPlayer();
 
     // Add coordinate to board and update display
     currentPlayer.position.push(clickedCell.getAttribute("id"));
     clickedCell.textContent = currentPlayer.symbol;
-    winnerAnnouncement(currentPlayer);
-    if (isDraw()) {
-      drawAnnouncement();
-    }
+  }
+
+  function latestPlayer() {
+    return board.gameRecord[board.latestSymbol() === "O" ? 1 : 0];
   }
 
   function isInvalidClick(clickedCell) {
@@ -117,24 +116,16 @@ const display = (function () {
     return player1 + player2 === 9 && !board.checkWin();
   }
 
-  function winnerAnnouncement(currentPlayer) {
-    if (board.checkWin()) {
-      console.log(`The winner is ${currentPlayer.name}`);
-    }
-  }
-
-  function drawAnnouncement() {
-    console.log("Draw");
-  }
-
-  return { validClick };
+  return { validClick, latestPlayer, isDraw };
 })();
 
 // Main module
 (function () {
   const table = document.querySelector("table");
-  const player1 = new Player("Yusuf", "X");
-  const player2 = new Player("Subastian", "O");
+  const player1 = new Player("Player 1", "X");
+  const player2 = new Player("Player 2", "O");
+  const button = document.querySelector("button");
+  const popup = document.getElementById("pop-up");
 
   board.add(player1);
   board.add(player2);
@@ -142,5 +133,49 @@ const display = (function () {
   // event listener
   table.addEventListener("click", (action) => {
     display.validClick(action);
+
+    if (board.checkWin()) {
+      showPopUp();
+    }
+
+    if (display.isDraw()) {
+      showPopUp();
+    }
   });
+
+  button.addEventListener("click", () => {
+    removePopUp();
+  });
+
+  // function
+  function showPopUp() {
+    popup.classList.remove("hidden");
+    winnerOrDraw();
+  }
+
+  function removePopUp() {
+    popup.classList.add("hidden");
+    resetBoard();
+  }
+
+  function resetBoard() {
+    board.gameRecord[0].position = [];
+    board.gameRecord[1].position = [];
+    document.querySelectorAll("td").forEach((td) => (td.innerHTML = ""));
+  }
+
+  function winnerOrDraw() {
+    const player = display.latestPlayer().name;
+    const winner =
+      board.gameRecord[0].name === player
+        ? board.gameRecord[1].name
+        : board.gameRecord[0].name;
+
+    if (display.isDraw()) {
+      document.getElementById("winner").textContent = "The game is draw";
+      return;
+    }
+
+    document.getElementById("winner").textContent = "The winner is " + winner;
+  }
 })();
